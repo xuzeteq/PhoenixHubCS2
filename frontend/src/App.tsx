@@ -13,6 +13,7 @@ import ProfilePage from './pages/ProfilePage';
 import AdminHomePage from './pages/Admin/AdminHomePage';
 import AdminUsersPage from './pages/Admin/AdminUsersPage';
 import AdminLogsPage from './pages/Admin/AdminLogsPage';
+import AdminAuditPage from './pages/Admin/AdminAuditPage';
 
 export default function App() {
   return (
@@ -33,7 +34,7 @@ export default function App() {
               <Route path='/admin' element = { <AdminHomePage /> } />
               <Route path='/admin/users' element = { <AdminUsersPage /> } />
               <Route path='/admin/logs' element = { <AdminLogsPage /> } />
-              
+              <Route path='/admin/audit-logs' element = { <AdminAuditPage /> } />
             </Routes>
           </main>
 

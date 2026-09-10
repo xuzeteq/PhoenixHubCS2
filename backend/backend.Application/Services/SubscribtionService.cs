@@ -1,6 +1,7 @@
 ﻿using backend.Application.Dtos.Subscribtion;
 using backend.Application.Interfaces;
 using backend.Application.Mappings;
+using backend.Domain.Constants;
 using backend.Domain.Enums.User;
 using backend.Domain.Exceptions;
 using backend.Domain.Models;
@@ -14,14 +15,16 @@ namespace backend.Application.Services
         private readonly IUserRepository _userRepo;
         private readonly IUnitOfWork _transaction;
         private readonly ILogger<SubscribtionService> _logger;
+        private readonly IAuditLogsService _audit;
 
         public SubscribtionService(ISubscribtionRepository repo, IUserRepository userRepo, ILogger<SubscribtionService> logger,
-            IUnitOfWork transaction)
+            IUnitOfWork transaction, IAuditLogsService audit)
         {
             _repo = repo;
             _logger = logger;
             _userRepo = userRepo;
             _transaction = transaction;
+            _audit = audit;
         }
 
         public async Task<List<SubscribtionResponseDto>> GetAllSubscribtionsAsync(CancellationToken cts = default)
@@ -40,9 +43,24 @@ namespace backend.Application.Services
             decimal subscribtionPrice = 249m;
 
             if (user.Balance < subscribtionPrice)
-                throw new Exception("Недостаточно средств для покупки подписки.");
+            {
+                await _audit.LogAsync(new AuditLog
+                {
+                    EntityType = "Subscribtion",
+                    EntityName = "Phoenix",
+                    UserId = user.Id,
+                    Username = user.Username,
+                    Action = AuditActions.SUBSCRIBTION_FAILED_PURCHASE_HAVENT_BALANCE,
+                    IsSuccess = false,
+                    StatusCode = 400,
+                });
+
+                throw new BadRequestException("Недостаточно средств", "400");
+            }
 
             await _transaction.BeginTransactionAsync(cts);
+
+            var oldBalance = user.Balance;
 
             try
             {
@@ -54,12 +72,38 @@ namespace backend.Application.Services
                 if (isSubscribeActive)
                 {
                     user.SubscribtionExpireAt = user.SubscribtionExpireAt!.Value.AddDays(30);
-                    _logger.LogInformation("Пользователь {username} продлил подписку Phoenix на 1 мес.", user.Username);
+
+                    await _audit.LogAsync(new AuditLog
+                    {
+                        EntityType = "Subscribtion",
+                        EntityName = "Phoenix",
+                        UserId = user.Id,
+                        Username = user.Username,
+                        Action = AuditActions.SUBSCRIBTION_RENEWED,
+                        OldValue = oldBalance.ToString(),
+                        NewValue = user.Balance.ToString(),
+                        ValidUntil = user.SubscribtionExpireAt,
+                        IsSuccess = true,
+                        StatusCode = 200,
+                    });
                 }
                 else
                 {
                     user.SubscribtionExpireAt = DateTime.UtcNow.AddDays(30);
-                    _logger.LogInformation("Пользователь {username} приобрел подписку Phoenix на 1 мес.", user.Username);
+
+                    await _audit.LogAsync(new AuditLog
+                    {
+                        EntityType = "Subscribtion",
+                        EntityName = "Phoenix",
+                        UserId = user.Id,
+                        Username = user.Username,
+                        OldValue = oldBalance.ToString(),
+                        NewValue = user.Balance.ToString(),
+                        ValidUntil = user.SubscribtionExpireAt,
+                        Action = AuditActions.SUBSCRIBTION_PURCHASED,
+                        IsSuccess = true,
+                        StatusCode = 200,
+                    });
                 }
 
                 var subscribtion = new Subscribtion
@@ -78,7 +122,18 @@ namespace backend.Application.Services
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Ошибка подписки!");
+                await _audit.LogAsync(new AuditLog
+                {
+                    EntityType = "Subscribtion",
+                    EntityName = "Phoenix",
+                    UserId = user.Id,
+                    Username = user.Username,
+                    Action = AuditActions.SUBSCRIBTION_RENEWED,
+                    IsSuccess = false,
+                    StatusCode = 500,
+                });
+
+                _logger.LogError(ex, "Ошибка сервера подписок.");
                 await _transaction.RollbackTransactionAsync(cts);
                 throw;
             }

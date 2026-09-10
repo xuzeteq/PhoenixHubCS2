@@ -13,9 +13,9 @@ namespace backend.Domain.Constants
 
         public const string PROMOCODE_ACTIVATED = "активировал промокод.";
         public const string PROMOCODE_FAILED = "не смог активировал промокод. Ошибка промокодов.";
-        public const string PROMOCODE_EXPIRED = "не смог активировать промкод. Промокод истек.";
-        public const string PROMOCODE_NOT_FOUND = "не смог активировать промкод. Промокод не найден.";
-        public const string PROMOCODE_USAGE_LIMIT = "не смог активировать промкод. Промокод использован максимальное кол-во раз.";
+        public const string PROMOCODE_EXPIRED = "не смог активировать промокод. Промокод истек.";
+        public const string PROMOCODE_NOT_FOUND = "не смог активировать промокод. Промокод не найден.";
+        public const string PROMOCODE_USAGE_LIMIT = "не смог активировать промокод. Промокод использован максимальное кол-во раз.";
         public const string PROMOCODE_ALREADY_USED = "попытался активировать промокод повторно.";
 
         public const string SUBSCRIBTION_PURCHASED = "успешно приобрел подписку Phoenix на 1 мес.";

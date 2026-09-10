@@ -133,7 +133,7 @@ namespace backend.Application.Services
                     Action = AuditActions.PROMOCODE_ALREADY_USED,
                     IsSuccess = false,
                     StatusCode = 400,
-                    ErrorMessage = "Срок действия промокода истек."
+                    ErrorMessage = "Пользователь уже активировал этот промокод."
                 });
 
                 return new PromocodeActivationResult.AlreadyUsed();

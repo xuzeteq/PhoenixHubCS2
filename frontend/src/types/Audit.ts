@@ -32,7 +32,7 @@ export interface AuditQuery {
 }
 
 export interface AuditResponse {
-    logs: AuditLog[];
+    audit: AuditLog[];
     totalLogs: number;
     page: number;
     pageSize: number;

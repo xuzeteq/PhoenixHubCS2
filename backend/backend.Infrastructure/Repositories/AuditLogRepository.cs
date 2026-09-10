@@ -21,7 +21,13 @@ namespace backend.Infrastructure.Repositories
                 q = q.Where(l => l.UserId == query.UserId.Value);
 
             if (!string.IsNullOrEmpty(query.Action))
-                q = q.Where(l => l.Action == query.Action);
+                q = q.Where(l => l.Action.Contains(query.Action));
+
+            if (!string.IsNullOrEmpty(query.Username))
+                q = q.Where(l => l.Username.Contains(query.Username));
+
+            if (!string.IsNullOrEmpty(query.EntityName))
+                q = q.Where(l => l.EntityName.Contains(query.EntityName));
 
             if (!string.IsNullOrEmpty(query.EntityType))
                 q = q.Where(l => l.EntityType == query.EntityType);

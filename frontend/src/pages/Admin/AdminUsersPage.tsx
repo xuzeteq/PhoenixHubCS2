@@ -17,7 +17,7 @@ export default function AdminUsersPage() {
                 <Header />
             </div>
 
-            <div className="ml-55">
+            <div className="ml-55 mt-5">
                 <div className="w-330 mx-auto">
                     <div className="overflow-hidden rounded-xl">
                         <table className="w-full border-separate border-spacing-0 bg-[#1c1c1c] text-[#e0e0e0]">

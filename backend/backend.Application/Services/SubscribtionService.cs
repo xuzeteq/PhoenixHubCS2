@@ -2,6 +2,7 @@
 using backend.Application.Interfaces;
 using backend.Application.Mappings;
 using backend.Domain.Enums.User;
+using backend.Domain.Exceptions;
 using backend.Domain.Models;
 using Microsoft.Extensions.Logging;
 
@@ -34,10 +35,7 @@ namespace backend.Application.Services
             var user = await _userRepo.GetByIdAsync(userId);
 
             if (user == null)
-            {
-                _logger.LogWarning("Пользователь c ID: {userId} не найден.", userId);
-                throw new Exception("Пользователь не найден!");
-            }
+                throw new NotFoundException("Пользователь", userId);
 
             decimal subscribtionPrice = 249m;
 

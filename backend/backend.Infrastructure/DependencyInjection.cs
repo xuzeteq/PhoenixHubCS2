@@ -21,6 +21,10 @@ namespace backend.Infrastructure
             services.AddScoped<IUserRepository, UserRepository>();
             services.AddScoped<IPromocodeRepository, PromocodeRepository>();
             services.AddScoped<ISubscribtionRepository, SubscribtionRepository>();
+            services.AddScoped<IPrivilegeRepository, PrivilegeRepository>();
+            services.AddScoped<IFeatureRepository, FeatureRepository>();
+
+            services.AddScoped<LogRepository>();
 
             services.AddScoped<IUnitOfWork, UnitOfWork>();
 

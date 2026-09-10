@@ -12,6 +12,7 @@ import AuthCallback from './pages/Callback';
 import ProfilePage from './pages/ProfilePage';
 import AdminHomePage from './pages/Admin/AdminHomePage';
 import AdminUsersPage from './pages/Admin/AdminUsersPage';
+import AdminLogsPage from './pages/Admin/AdminLogsPage';
 
 export default function App() {
   return (
@@ -31,6 +32,7 @@ export default function App() {
               <Route path="/profile/:steamId" element={ <ProfilePage /> } />
               <Route path='/admin' element = { <AdminHomePage /> } />
               <Route path='/admin/users' element = { <AdminUsersPage /> } />
+              <Route path='/admin/logs' element = { <AdminLogsPage /> } />
               
             </Routes>
           </main>

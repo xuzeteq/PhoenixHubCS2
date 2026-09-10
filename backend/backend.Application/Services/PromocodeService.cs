@@ -2,6 +2,7 @@
 using backend.Application.Interfaces;
 using backend.Application.Mappings;
 using backend.Application.Results;
+using backend.Domain.Exceptions;
 using backend.Domain.Models;
 using Microsoft.Extensions.Logging;
 
@@ -25,10 +26,7 @@ namespace backend.Application.Services
             var existedPromocode = await _repo.GetByCodeAsync(dto.Code);
 
             if (existedPromocode != null)
-            {
-                _logger.LogWarning("Промокод {code} уже существует.", dto.Code);
-                throw new Exception("Промокод уже существует!");
-            }
+                throw new ConflictException("Промокод", existedPromocode.Code);
 
             var promocode = new Promocode
             {
@@ -56,10 +54,7 @@ namespace backend.Application.Services
             var promocode = await _repo.GetByIdAsync(id);
 
             if (promocode == null)
-            {
-                _logger.LogWarning("Промокод с ID: {id} не найден.", id);
-                throw new Exception("Промокод не найден!");
-            }
+                throw new NotFoundException("Промокод", id);
 
             return promocode.ToDto();
         }
@@ -123,10 +118,7 @@ namespace backend.Application.Services
             var promocode = await _repo.GetByIdAsync(id);
 
             if (promocode == null)
-            {
-                _logger.LogWarning("Промокод с ID: {id} не найден.", id);
-                return false;
-            }
+                throw new NotFoundException("Промокод", id);
 
             await _repo.RemoveAsync(promocode);
             return true;
@@ -137,11 +129,8 @@ namespace backend.Application.Services
             var promocode = await _repo.GetByIdAsync(id);
 
             if (promocode == null)
-            {
-                _logger.LogWarning("Промокод с ID: {id} не найден.", id);
-                throw new Exception("Промокод не найден!");
-            }
-
+                throw new NotFoundException("Промокод", id);
+            
             await _repo.UpdateAsync(promocode);
             return promocode.ToDto();
         }

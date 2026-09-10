@@ -1,6 +1,7 @@
 ﻿using backend.Application.Dtos.User;
 using backend.Application.Interfaces;
 using backend.Application.Mappings;
+using backend.Domain.Exceptions;
 
 namespace backend.Application.Services
 {
@@ -24,7 +25,7 @@ namespace backend.Application.Services
             var user = await _repo.GetBySteamIdAsync(steamId, cts);
 
             if (user == null)
-                throw new Exception("Пользователь не найден!");
+                throw new NotFoundException("Пользователь", int.Parse(steamId));
 
             return user.ToDto();
         }

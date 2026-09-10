@@ -1,6 +1,7 @@
 ﻿using backend.Application.Dtos.Server;
 using backend.Application.Interfaces;
 using backend.Application.Mappings;
+using backend.Domain.Exceptions;
 using backend.Domain.Models;
 using Microsoft.Extensions.Logging;
 
@@ -29,10 +30,7 @@ namespace backend.Application.Services
             var server = await _repo.GetByIdAsync(id);
 
             if (server == null)
-            {
-                _logger.LogWarning("Сервер с ID: {id} не найден.", id);
-                throw new Exception("Сервер не найден!");
-            }
+                throw new NotFoundException("Сервер", id);
 
             return server.ToDto();
         }
@@ -53,7 +51,7 @@ namespace backend.Application.Services
             };
 
             await _repo.AddAsync(server);
-            _logger.LogInformation("Лобавление нового сервера: {ip}:{port}", dto.IpAddress, dto.Port);
+            _logger.LogInformation("Добавление нового сервера: {ip}:{port}", dto.IpAddress, dto.Port);
             return server.ToDto();
         }
 
@@ -62,10 +60,7 @@ namespace backend.Application.Services
             var server = await _repo.GetByIdAsync(id);
 
             if (server == null)
-            {
-                _logger.LogWarning("Сервер с ID: {id} не найден.", id);
-                throw new Exception("Сревер не найден");
-            }
+                throw new NotFoundException("Сервер", id);
 
             await _repo.RemoveAsync(server);
             _logger.LogInformation("Удаление сервера: {ip}:{port}", server.IpAddress, server.Port);

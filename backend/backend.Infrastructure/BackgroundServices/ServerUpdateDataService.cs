@@ -38,7 +38,7 @@ namespace backend.Infrastructure.BackgroundServices
             } 
             catch (Exception ex)
             {
-                _logger.LogError("Ошибка обновления серверов: {ex}", ex.Message);
+                _logger.LogWarning("Ошибка обновления серверов: {ex}", ex.Message);
             }
         }
 

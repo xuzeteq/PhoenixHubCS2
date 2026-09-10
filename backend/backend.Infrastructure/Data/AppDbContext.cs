@@ -12,6 +12,10 @@ namespace backend.Infrastructure.Data
         public DbSet<Promocode> Promocodes { get; set; }
         public DbSet<PromocodeUsage> PromocodeUsages { get; set; }
         public DbSet<Subscribtion> Subscribtions { get; set; }
+        public DbSet<Feature> Features { get; set; }
+        public DbSet<Privilege> Privileges { get; set; }
+        public DbSet<PrivilegeFeature> PrivilegeFeatures { get; set; }
+        public DbSet<AppLog> Logs { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -46,6 +50,51 @@ namespace backend.Infrastructure.Data
                 entity.Property(e => e.UserId).HasColumnName("user_id");
                 entity.Property(e => e.CreatedAt).HasColumnName("created_at");
                 entity.Property(e => e.ExpireAt).HasColumnName("expire_at");
+            });
+
+            modelBuilder.Entity<Feature>(entity =>
+            {
+                entity.ToTable("features");
+
+                entity.Property(e => e.Id).HasColumnName("id");
+                entity.Property(e => e.Title).HasColumnName("title");
+                entity.Property(e => e.Description).HasColumnName("description");
+                entity.Property(e => e.Icon).HasColumnName("icon");
+                entity.Property(e => e.CreatedAt).HasColumnName("created_at");
+            });
+
+            modelBuilder.Entity<Privilege>(entity =>
+            {
+                entity.ToTable("privileges");
+
+                entity.Property(e => e.Id).HasColumnName("id");
+                entity.Property(e => e.Title).HasColumnName("title");
+                entity.Property(e => e.Price).HasColumnName("price");
+                entity.Property(e => e.OldPrice).HasColumnName("old_price");
+                entity.Property(e => e.CreatedAt).HasColumnName("created_at");
+            });
+
+            modelBuilder.Entity<PrivilegeFeature>(entity =>
+            {
+                entity.ToTable("privilege_features");
+
+                entity.Property(e => e.Id).HasColumnName("id");
+                entity.Property(e => e.FeatureId).HasColumnName("feature_id");
+                entity.Property(e => e.PrivilegeId).HasColumnName("privilege_id");
+                entity.Property(e => e.Value).HasColumnName("value");
+            });
+
+            modelBuilder.Entity<AppLog>(entity =>
+            {
+                entity.ToTable("logs");
+                entity.HasNoKey();
+
+                entity.Property(e => e.Message).HasColumnName("message");
+                entity.Property(e => e.MessageTemplate).HasColumnName("message_template");
+                entity.Property(e => e.Level).HasColumnName("level");
+                entity.Property(e => e.Timestamp).HasColumnName("timestamp");
+                entity.Property(e => e.Exception).HasColumnName("exception");
+                entity.Property(e => e.Properties).HasColumnName("properties");
             });
         }
     }

@@ -14,7 +14,9 @@ namespace backend.Application
             services.AddScoped<IAdminUserService, AdminUserService>();
             services.AddScoped<ISubscribtionService, SubscribtionService>();
             services.AddScoped<IUserService, UserService>();
+            services.AddScoped<IPrivilegeService, PrivilegeService>();
             services.AddScoped<IPromocodeService, PromocodeService>();
+            services.AddScoped<IFeatureService, FeatureService>();
             services.AddScoped<SubscribtionsCleanupService>();
 
             return services;

@@ -3,6 +3,7 @@ using backend.Application.Interfaces;
 using backend.Application.Mappings;
 using backend.Application.Options;
 using backend.Application.Security;
+using backend.Domain.Constants;
 using backend.Domain.Enums.User;
 using backend.Domain.Models;
 using Microsoft.Extensions.Logging;
@@ -16,13 +17,16 @@ namespace backend.Application.Services
         private readonly IJwtTokenService _jwt;
         private readonly JwtOptions _jwtOptions;
         private readonly ILogger<AuthService> _logger;
+        private readonly IAuditLogsService _audit;
 
-        public AuthService(IUserRepository users, IJwtTokenService jwt, IOptions<JwtOptions> jwtOptions, ILogger<AuthService> logger)
+        public AuthService(IUserRepository users, IJwtTokenService jwt, IOptions<JwtOptions> jwtOptions,
+            ILogger<AuthService> logger, IAuditLogsService audit)
         {
             _users = users;
             _jwt = jwt;
             _jwtOptions = jwtOptions.Value;
             _logger = logger;
+            _audit = audit;
         }
 
         public async Task<User> UpsertSteamUserAsync(string steamId, string username, string avatarUrl, CancellationToken cancellationToken = default)
@@ -44,7 +48,17 @@ namespace backend.Application.Services
                 };
 
                 await _users.AddAsync(user, cancellationToken);
-                _logger.LogInformation("Пользователь не найден, регистрация нового пользователя.");
+
+                await _audit.LogAsync(new AuditLog
+                {
+                    EntityType = "Auth",
+                    EntityName = user.Username,
+                    UserId = user.Id,
+                    Username = user.Username,
+                    Action = AuditActions.REGISTERED,
+                    IsSuccess = true,
+                    StatusCode = 200,
+                });
             }
             else
             {
@@ -53,6 +67,17 @@ namespace backend.Application.Services
                     user.Username = username;
                 if (!string.IsNullOrWhiteSpace(avatarUrl))
                     user.AvatarUrl = avatarUrl;
+
+                await _audit.LogAsync(new AuditLog
+                {
+                    EntityType = "Auth",
+                    EntityName = user.Username,
+                    UserId = user.Id,
+                    Username = user.Username,
+                    Action = AuditActions.LOGIN,
+                    IsSuccess = true,
+                    StatusCode = 200,
+                });
             }
 
             await _users.SaveChangesAsync(cancellationToken);
@@ -126,6 +151,17 @@ namespace backend.Application.Services
             user.RefreshToken = null;
             user.RefreshTokenExpiry = null;
             await _users.SaveChangesAsync(cancellationToken);
+
+            await _audit.LogAsync(new AuditLog
+            {
+                EntityType = "Auth",
+                EntityName = user.Username,
+                UserId = user.Id,
+                Username = user.Username,
+                Action = AuditActions.LOGOUT,
+                IsSuccess = true,
+                StatusCode = 200,
+            });
         }
     }
 }

@@ -1,9 +1,12 @@
-﻿using backend.Application.Dtos.Logs;
+﻿using backend.Application.Dtos.AuditLog;
+using backend.Application.Dtos.Logs;
 using backend.Application.Dtos.User;
 using backend.Application.Interfaces;
 using backend.Infrastructure.Repositories;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Scalar.AspNetCore;
+using Serilog;
 
 namespace backend.API.Controllers
 {
@@ -13,11 +16,13 @@ namespace backend.API.Controllers
     {
         private readonly IAdminUserService _userService;
         private readonly LogRepository _logRepo;
+        private readonly AuditLogRepository _auditRepo;
 
-        public AdminController(IAdminUserService userService, LogRepository logRepo)
+        public AdminController(IAdminUserService userService, LogRepository logRepo, AuditLogRepository auditRepo)
         {
             _userService = userService;
             _logRepo = logRepo;
+            _auditRepo = auditRepo;
         }
 
         [HttpGet("users")]
@@ -38,6 +43,37 @@ namespace backend.API.Controllers
                 page = query.Page,
                 pageSize = query.PageSize,
                 totalPages = (int)Math.Ceiling(totalLogs / (double)query.PageSize)
+            });
+        }
+
+        [HttpGet("audit")]
+        public async Task<IActionResult> GetLogs([FromQuery] AuditLogQueryDto query)
+        {
+            var (audit, logCount) = await _auditRepo.GetLogsAsync(query);
+
+            return Ok(new
+            {
+                audit,
+                totalLogs = logCount,
+                page = query.Page,
+                pageSize = query.PageSize,
+                totalPages = (int)Math.Ceiling(logCount / (double)query.PageSize)
+            });
+        }
+
+        [HttpGet("audit/user/{id}")]
+        public async Task<IActionResult> GetUserLogs(int userId, [FromQuery] AuditLogQueryDto query)
+        {
+            query.UserId = userId;
+            var (audit, logCount) = await _auditRepo.GetLogsAsync(query);
+
+            return Ok(new
+            {
+                audit,
+                totalLogs = logCount,
+                page = query.Page,
+                pageSize = query.PageSize,
+                totalPages = (int)Math.Ceiling(logCount / (double)query.PageSize)
             });
         }
     }

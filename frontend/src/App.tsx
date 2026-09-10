@@ -33,7 +33,6 @@ export default function App() {
               <Route path='/admin' element = { <AdminHomePage /> } />
               <Route path='/admin/users' element = { <AdminUsersPage /> } />
               <Route path='/admin/logs' element = { <AdminLogsPage /> } />
-              
             </Routes>
           </main>
 

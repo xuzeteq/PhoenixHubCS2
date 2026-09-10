@@ -16,6 +16,7 @@ namespace backend.Infrastructure.Data
         public DbSet<Privilege> Privileges { get; set; }
         public DbSet<PrivilegeFeature> PrivilegeFeatures { get; set; }
         public DbSet<AppLog> Logs { get; set; }
+        public DbSet<AuditLog> AuditLogs { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -95,6 +96,37 @@ namespace backend.Infrastructure.Data
                 entity.Property(e => e.Timestamp).HasColumnName("timestamp");
                 entity.Property(e => e.Exception).HasColumnName("exception");
                 entity.Property(e => e.Properties).HasColumnName("properties");
+            });
+
+            modelBuilder.Entity<AuditLog>(entity =>
+            {
+                entity.ToTable("audit_logs");
+                entity.HasKey(e => e.Id);
+
+                entity.HasIndex(e => e.UserId);
+                entity.HasIndex(e => e.Timestamp);
+                entity.HasIndex(e => e.Action);
+                entity.HasIndex(e => e.EntityType);
+                entity.HasIndex(e => new { e.UserId, e.Timestamp });
+
+                entity.Property(e => e.Id).HasColumnName("id");
+                entity.Property(e => e.UserId).HasColumnName("user_id");
+                entity.Property(e => e.Username).HasMaxLength(100).HasColumnName("username");
+                entity.Property(e => e.Action).HasMaxLength(50).IsRequired().HasColumnName("action");
+                entity.Property(e => e.EntityType).HasMaxLength(100).IsRequired().HasColumnName("entity_type");
+                entity.Property(e => e.EntityId).HasMaxLength(100).HasColumnName("entity_id");
+                entity.Property(e => e.EntityName).HasMaxLength(200).HasColumnName("entity_name");
+                entity.Property(e => e.OldValue).HasColumnName("old_value");
+                entity.Property(e => e.NewValue).HasColumnName("new_value");
+                entity.Property(e => e.StatusCode).HasColumnName("status_code");
+                entity.Property(e => e.IsSuccess).HasColumnName("is_success");
+                entity.Property(e => e.ErrorMessage).HasMaxLength(1000).HasColumnName("error_message");
+                entity.Property(e => e.Amount).HasColumnName("amount");
+                entity.Property(e => e.Currency).HasMaxLength(10).HasColumnName("currency");
+                entity.Property(e => e.DurationDays).HasMaxLength(10).HasColumnName("duration_days");
+                entity.Property(e => e.ValidUntil).HasMaxLength(10).HasColumnName("valid_until");
+                entity.Property(e => e.Metadata).HasMaxLength(10).HasColumnName("metadata");
+                entity.Property(e => e.Timestamp).HasMaxLength(10).HasColumnName("timestamp");
             });
         }
     }

@@ -4,6 +4,7 @@ using backend.Infrastructure.BackgroundServices;
 using backend.Infrastructure.Data;
 using backend.Infrastructure.Persistence;
 using backend.Infrastructure.Repositories;
+using backend.Infrastructure.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -23,6 +24,9 @@ namespace backend.Infrastructure
             services.AddScoped<ISubscribtionRepository, SubscribtionRepository>();
             services.AddScoped<IPrivilegeRepository, PrivilegeRepository>();
             services.AddScoped<IFeatureRepository, FeatureRepository>();
+
+            services.AddScoped<AuditLogRepository>();
+            services.AddScoped<IAuditLogsService, AuditLogsService>();
 
             services.AddScoped<LogRepository>();
 

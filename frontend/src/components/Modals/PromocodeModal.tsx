@@ -58,7 +58,6 @@ export default function PromocodeModal({ isOpen, onClose }: PromocodeModalProps)
     setError(null);
 
     try {
-      const data = await promocodeApi.activatePromocode(code.trim().toUpperCase());
       setCode('');
       onClose();
     } catch (err) {

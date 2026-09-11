@@ -24,14 +24,15 @@ const METHODS: { id: PaymentMethod; label: string; hint: string; icon: string }[
     },
 ]
 
-const BALANCE = [100, 200, 500, 1000, 2000];
+const BALANCE = ["100", "200", "500", "1000", "2000"];
 
 export default function PaymentModal({ onClose }: PaymetModalProps) {
 
     const [method, setMethod] = useState('sbp')
-    const [balance, setBalance] = useState<number>(100);
+    const [balance, setBalance] = useState<string>('100');
     const [agree, setAgree] = useState<boolean>(false)
     const selected = METHODS.find(m => m.id === method);
+    const showBalance = Number(balance);
 
     return (
         <>
@@ -95,9 +96,15 @@ export default function PaymentModal({ onClose }: PaymetModalProps) {
                                 </h2>
                                 
                                 <p className='mt-4 text-white/70 font-semibold text-sm'>Сумма пополнения, ₽</p>
-                                <input type="text" placeholder='Сумма оплаты'
-                                    value={balance}
-                                    onChange={(e) => setBalance(Number(e.target.value))}
+                                <input type="text"  placeholder='Сумма оплаты'
+                                    value={balance} inputMode='numeric'
+                                    onChange={(e) => {
+                                        const value = e.target.value
+                                        if (value === '' || /^\d+$/.test(value)) {
+                                            setBalance(value);
+                                        }
+                                    }}
+                                    
                                     className='bg-[#161616] text-white/40 font-semibold p-2 w-full h-10 rounded-lg mt-2 
                                         focus:ring-0 focus:outline-none focus:text-white
                                         transition-all duration-300'/>
@@ -115,7 +122,7 @@ export default function PaymentModal({ onClose }: PaymetModalProps) {
 
                                 <h2 className='text-white/40 px-3 flex items-center gap-2 font-semibold py-2 bg-[#161616] mt-4 rounded-lg'>
                                     <span>Получите на баланс:</span>
-                                    <span className='text-white'>{balance}</span>
+                                    <span className='text-white'>{showBalance}</span>
                                 </h2>
 
                                 <div>

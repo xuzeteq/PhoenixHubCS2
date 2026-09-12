@@ -18,6 +18,7 @@ namespace backend.Infrastructure.Data
         public DbSet<AppLog> Logs { get; set; }
         public DbSet<AuditLog> AuditLogs { get; set; }
         public DbSet<BalanceTransaction> BalanceTransactions { get; set; }
+        public DbSet<UserPrivilege> UserPrivileges { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -72,6 +73,7 @@ namespace backend.Infrastructure.Data
                 entity.Property(e => e.Id).HasColumnName("id");
                 entity.Property(e => e.Title).HasColumnName("title");
                 entity.Property(e => e.Price).HasColumnName("price");
+                entity.Property(e => e.ImageUrl).HasColumnName("image_url");
                 entity.Property(e => e.OldPrice).HasColumnName("old_price");
                 entity.Property(e => e.CreatedAt).HasColumnName("created_at");
             });
@@ -113,7 +115,7 @@ namespace backend.Infrastructure.Data
                 entity.Property(e => e.Id).HasColumnName("id");
                 entity.Property(e => e.UserId).HasColumnName("user_id");
                 entity.Property(e => e.Username).HasMaxLength(100).HasColumnName("username");
-                entity.Property(e => e.Action).HasMaxLength(50).IsRequired().HasColumnName("action");
+                entity.Property(e => e.Action).HasMaxLength(100).IsRequired().HasColumnName("action");
                 entity.Property(e => e.EntityType).HasMaxLength(100).IsRequired().HasColumnName("entity_type");
                 entity.Property(e => e.EntityId).HasMaxLength(100).HasColumnName("entity_id");
                 entity.Property(e => e.EntityName).HasMaxLength(200).HasColumnName("entity_name");
@@ -143,6 +145,16 @@ namespace backend.Infrastructure.Data
                 entity.Property(e => e.ReferenceId).HasColumnName("reference_id");
                 entity.Property(e => e.Metadata).HasColumnName("metadata");
                 entity.Property(e => e.CreatedAt).HasColumnName("created_at");
+            });
+
+            modelBuilder.Entity<UserPrivilege>(entity =>
+            {
+                entity.ToTable("user_privileges");
+
+                entity.Property(e => e.Id).HasColumnName("id");
+                entity.Property(e => e.UserId).HasColumnName("user_id");
+                entity.Property(e => e.PrivilegeId).HasColumnName("privilege_id");
+                entity.Property(e => e.PurchasedAt).HasColumnName("purchased_at");
             });
         }
     }

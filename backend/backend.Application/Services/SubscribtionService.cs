@@ -1,6 +1,7 @@
 ﻿using backend.Application.Dtos.Subscribtion;
 using backend.Application.Interfaces;
 using backend.Application.Mappings;
+using backend.Application.Results;
 using backend.Domain.Constants;
 using backend.Domain.Enums.User;
 using backend.Domain.Exceptions;
@@ -36,7 +37,7 @@ namespace backend.Application.Services
             return subscribtions.Select(s => s.ToDto()).ToList();
         }
 
-        public async Task PurchaseSubscribeAsync(int userId, CancellationToken cts = default)
+        public async Task<SubscribtionPurchaseResult> PurchaseSubscribeAsync(int userId, CancellationToken cts = default)
         {
             var user = await _userRepo.GetByIdAsync(userId);
 
@@ -58,7 +59,7 @@ namespace backend.Application.Services
                     StatusCode = 400,
                 });
 
-                throw new BadRequestException("Недостаточно средств", "400");
+                return new SubscribtionPurchaseResult.HaventMoney();
             }
 
             await _transaction.BeginTransactionAsync(cts);
@@ -121,6 +122,8 @@ namespace backend.Application.Services
 
                 await _transaction.SaveChangesAsync(cts);
                 await _transaction.CommitTransactionAsync(cts);
+
+                return new SubscribtionPurchaseResult.Success(subscribtion);
             }
             catch (Exception ex)
             {
@@ -137,7 +140,8 @@ namespace backend.Application.Services
 
                 _logger.LogError(ex, "Ошибка сервера подписок.");
                 await _transaction.RollbackTransactionAsync(cts);
-                throw;
+
+                return new SubscribtionPurchaseResult.Error("Возникла внутренняя ошибка сервиса подписок. Попробуйте позже");
             }
         }
     }

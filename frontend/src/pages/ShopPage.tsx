@@ -1,11 +1,19 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import DonateCard from "../components/Card/DonateCard";
 import Header from "../components/Header/Header";
+import type { Privilege } from "../types/Privilege";
+import { privilegeApi } from "../api/privilege.api";
 
 export default function ShopPage() {
 
     useEffect(() => {
         document.title = 'Phoenix Hub - Магазин'
+    }, [])
+
+    const [privilege, setPrivilege] = useState<Privilege[]>();
+
+    useEffect(() => {
+        privilegeApi.getAllPrivileges().then(res => setPrivilege(res))
     }, [])
 
     return (
@@ -16,10 +24,11 @@ export default function ShopPage() {
 
                 <section id="#donate-section" className="w-330 mx-auto mt-12 mb-4">
 
-                    <div className="flex items-center justify-center gap-4">
-                        <DonateCard title="PREMIUM" price={249} image="premium.png" oldPrice={499} />
-                        <DonateCard title="ELITE" price={749} image="admin.png" oldPrice={999}/>
-                        <DonateCard title="ULTRA" price={1499} image="cs2.png" oldPrice={1999}/>
+                    <div className="flex justify-center gap-4">
+                        {privilege?.map(p => (
+                            <DonateCard id={p.id} key={p.id} price={p.price} title={p.title} image={p.imageUrl}
+                                features={p.features}/>
+                        ))}
                     </div>
 
                 </section>

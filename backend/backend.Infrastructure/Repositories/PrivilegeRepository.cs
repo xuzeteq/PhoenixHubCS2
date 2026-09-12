@@ -27,6 +27,16 @@ namespace backend.Infrastructure.Repositories
             _logger.LogInformation("Привилегия {name} (ID: {id}) успешно создана.", privilege.Title, privilege.Id);
         }
 
+        public async Task AddPrivilegeUserAsync(UserPrivilege userPrivilege)
+        {
+            await _context.UserPrivileges.AddAsync(userPrivilege);
+        }
+
+        public async Task<bool> HasUserPrivilegeAsync(int userId, int privilegeId)
+        {
+            return await _context.UserPrivileges.AnyAsync(u => u.UserId == userId && u.PrivilegeId == privilegeId);
+        }
+
         public async Task AddFeaturesToPrivilegeAsync(int privilegeId, List<int> featureIds)
         {
             var existingFeatures = await _context.Features

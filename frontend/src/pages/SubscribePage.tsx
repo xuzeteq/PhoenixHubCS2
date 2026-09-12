@@ -1,8 +1,17 @@
-import { IconCircleCheck } from "@tabler/icons-react";
+import { IconCircleCheck, IconExclamationCircle } from "@tabler/icons-react";
 import Header from "../components/Header/Header";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { subscribtionApi } from "../api/subscribtion.api";
 import { useNavigate } from "react-router-dom";
+import axios from "axios";
+import { AnimatePresence, motion } from "framer-motion";
+
+type ErrorType = 'HAVENT_MONEY' | 'GENERAL'
+
+interface ErrorInfo {
+    type: ErrorType,
+    message: string
+}
 
 export default function SubscribePage() {
 
@@ -12,12 +21,42 @@ export default function SubscribePage() {
 
     const navigate = useNavigate();
 
+    const [error, setError] = useState<ErrorInfo | null>(null)
+
+    const getError = (errorCode?: string, errorMessage?: string): ErrorInfo => {
+        switch (errorCode) {
+            case "HAVENT_MONEY":
+                return {
+                    type: 'HAVENT_MONEY',
+                    message: 'Недостаточно средств для покупки или продления подписки.'
+                }
+            default:
+                return {
+                    type: 'GENERAL',
+                    message: errorMessage || 'Ошибка активации промокода',
+                };
+            }
+        }
+
+    useEffect(() => {
+        if (!error) return;
+        const t = setTimeout(() => setError(null), 2000);
+        return () => clearTimeout(t);
+    }, [error]);
+
     const handlePurchase = async () => {
         try {
+            setError(null);
+
             await subscribtionApi.purchaseSubscribtion();
             navigate('/');
-        } catch (ex) {
-            console.error("Ошибка: ", ex)
+        } catch (err) {
+            if (axios.isAxiosError(err) && err.response) {
+                const errorData = err.response.data;
+                setError(getError(errorData.code, errorData.error))
+            } else {
+                setError(getError(undefined, "Нет соединения с сервером."))
+            }
         }
     }
 
@@ -26,6 +65,27 @@ export default function SubscribePage() {
             <div className="ml-55 min-h-screen bg-[#141414]">
 
                 <Header />
+
+                <AnimatePresence>
+                    {error && (
+                        <div className="fixed bottom-0 left-1/2 -translate-x-1/2 z-50 pointer-events-none">
+                        <motion.div
+                            initial={{ y: 120, opacity: 0 }}
+                            animate={{ y: 0, opacity: 1 }}
+                            exit={{ y: 120, opacity: 0 }}
+                            transition={{ type: 'spring', stiffness: 260, damping: 26 }}
+                            className="pointer-events-auto mb-4
+                                    flex items-center gap-3 p-3 pr-4 rounded-lg border shadow-lg
+                                    bg-red-500/10 border-red-500/30 text-red-400"
+                        >
+                            <div className="w-6 h-6 flex items-center justify-center shrink-0 mt-0.5">
+                            <IconExclamationCircle />
+                            </div>
+                            <p className="text-sm font-medium">{error.message}</p>
+                        </motion.div>
+                        </div>
+                    )}
+                </AnimatePresence>
 
                 <section className="w-full flex justify-center pt-16 pb-12 px-4">
                     <div className="relative w-full max-w-105 bg-[#161616]/80 backdrop-blur-xl rounded-2xl border border-white/10 overflow-hidden">
@@ -84,7 +144,7 @@ export default function SubscribePage() {
                             <p className="text-center text-xs text-gray-600 mt-4">
                                 Нажимая кнопку, вы соглашаетесь с офертой
                             </p>
-                        </div>
+                        </div> 
                     </div>
                 </section>
             </div>

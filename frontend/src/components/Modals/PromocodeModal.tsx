@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import { IconX } from "@tabler/icons-react";
 import { promocodeApi } from "../../api/promocde.api";
 import axios from "axios";
@@ -58,6 +58,7 @@ export default function PromocodeModal({ isOpen, onClose }: PromocodeModalProps)
     setError(null);
 
     try {
+      await promocodeApi.activatePromocode(code)
       setCode('');
       onClose();
     } catch (err) {
@@ -71,22 +72,6 @@ export default function PromocodeModal({ isOpen, onClose }: PromocodeModalProps)
       setLoading(false);
     }
   };
-
-  useEffect(() => {
-    const handleEsc = (e: KeyboardEvent) => {
-      if (e.key === "Escape") onClose();
-    };
-
-    if (isOpen) {
-      document.addEventListener("keydown", handleEsc);
-      document.body.style.overflow = "hidden";
-    }
-
-    return () => {
-      document.removeEventListener("keydown", handleEsc);
-      document.body.style.overflow = "";
-    };
-  }, [isOpen, onClose]);
 
   const handleBackdropClick = (e: React.MouseEvent) => {
     if (modalRef.current && !modalRef.current.contains(e.target as Node)) {

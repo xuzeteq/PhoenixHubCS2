@@ -17,6 +17,7 @@ namespace backend.Infrastructure.Data
         public DbSet<PrivilegeFeature> PrivilegeFeatures { get; set; }
         public DbSet<AppLog> Logs { get; set; }
         public DbSet<AuditLog> AuditLogs { get; set; }
+        public DbSet<BalanceTransaction> BalanceTransactions { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -127,6 +128,21 @@ namespace backend.Infrastructure.Data
                 entity.Property(e => e.ValidUntil).HasMaxLength(10).HasColumnName("valid_until");
                 entity.Property(e => e.Metadata).HasMaxLength(10).HasColumnName("metadata");
                 entity.Property(e => e.Timestamp).HasMaxLength(10).HasColumnName("timestamp");
+            });
+
+            modelBuilder.Entity<BalanceTransaction>(entity =>
+            {
+                entity.ToTable("balance_transactions");
+
+                entity.Property(e => e.Id).HasColumnName("id");
+                entity.Property(e => e.UserId).HasColumnName("user_id");
+                entity.Property(e => e.Type).HasColumnName("type");
+                entity.Property(e => e.BalanceBefore).HasColumnName("balance_before");
+                entity.Property(e => e.BalanceAfter).HasColumnName("balance_after");
+                entity.Property(e => e.Description).HasColumnName("description");
+                entity.Property(e => e.ReferenceId).HasColumnName("reference_id");
+                entity.Property(e => e.Metadata).HasColumnName("metadata");
+                entity.Property(e => e.CreatedAt).HasColumnName("created_at");
             });
         }
     }

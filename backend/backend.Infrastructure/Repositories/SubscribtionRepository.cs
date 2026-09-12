@@ -22,7 +22,6 @@ namespace backend.Infrastructure.Repositories
         public async Task AddAsync(Subscribtion subscribtion, CancellationToken cts = default)
         {
             await _context.Subscribtions.AddAsync(subscribtion, cts);
-            await _context.SaveChangesAsync(cts);
         }
 
         public async Task UpdateAsync(Subscribtion subscribtion, CancellationToken cts = default)

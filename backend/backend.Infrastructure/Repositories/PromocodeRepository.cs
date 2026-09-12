@@ -40,25 +40,21 @@ namespace backend.Infrastructure.Repositories
         public async Task AddUsageAsync(PromocodeUsage usage)
         {
             await _context.PromocodeUsages.AddAsync(usage);
-            await _context.SaveChangesAsync();
         }
 
         public async Task AddAsync(Promocode promocode)
         {
             await _context.Promocodes.AddAsync(promocode);
-            await _context.SaveChangesAsync();
         }
 
         public async Task UpdateAsync(Promocode promocode)
         {
             _context.Promocodes.Update(promocode);
-            await _context.SaveChangesAsync();
         }
 
         public async Task RemoveAsync(Promocode promocode)
         {
             _context.Promocodes.Remove(promocode);
-            await _context.SaveChangesAsync();
         }
     }
 }

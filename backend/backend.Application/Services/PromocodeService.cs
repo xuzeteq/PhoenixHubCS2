@@ -6,6 +6,7 @@ using backend.Domain.Constants;
 using backend.Domain.Exceptions;
 using backend.Domain.Models;
 using Microsoft.Extensions.Logging;
+using System.Text.Json;
 
 namespace backend.Application.Services
 {
@@ -15,14 +16,18 @@ namespace backend.Application.Services
         private readonly IUserRepository _userRepo;
         private readonly ILogger<PromocodeService> _logger;
         private readonly IAuditLogsService _audit;
+        private readonly IBalanceTransactionService _transactionService;
+        private readonly IUnitOfWork _transaction;
 
         public PromocodeService(ILogger<PromocodeService> logger, IPromocodeRepository repo, IUserRepository userRepo,
-            IAuditLogsService audit)
+            IAuditLogsService audit, IUnitOfWork transction, IBalanceTransactionService transactionService)
         {
             _logger = logger;
             _repo = repo;
             _userRepo = userRepo;
             _audit = audit;
+            _transaction = transction;
+            _transactionService = transactionService;
         }
 
         public async Task<PromocodeResponseDto> CreatePromocodeAsync(CreatePromocodeDto dto)
@@ -63,7 +68,7 @@ namespace backend.Application.Services
             return promocode.ToDto();
         }
 
-        public async Task<PromocodeActivationResult> ActivatePromocode(string code, int userId)
+        public async Task<PromocodeActivationResult> ActivatePromocode(string code, int userId, CancellationToken ct = default)
         {
             var promocode = await _repo.GetByCodeAsync(code);
             var user = await _userRepo.GetByIdAsync(userId);
@@ -139,11 +144,11 @@ namespace backend.Application.Services
                 return new PromocodeActivationResult.AlreadyUsed();
             }
 
+            await _transaction.BeginTransactionAsync(ct);
+
             try
             {
                 promocode.UsedCount++;
-
-                await _repo.UpdateAsync(promocode);
 
                 var usage = new PromocodeUsage
                 {
@@ -152,8 +157,18 @@ namespace backend.Application.Services
                     CreatedAt = DateTime.UtcNow,
                 };
                 await _repo.AddUsageAsync(usage);
-                await _userRepo.UpdateBalanceAsync(userId, promocode.GiveBalance);
 
+                await _transactionService.CreateDepositAsync(userId, promocode.GiveBalance,
+                    $"Активация промокода {promocode.Code}", metadata: JsonSerializer.Serialize(new
+                    {
+                        id = promocode.Id,
+                        code = promocode.Code,
+                        message = "Успешная активация промокода"
+                    }));
+
+                await _transaction.SaveChangesAsync(ct);
+                await _transaction.CommitTransactionAsync(ct);
+                
                 await _audit.LogAsync(new AuditLog
                 {
                     EntityType = "Promocode",
@@ -164,12 +179,14 @@ namespace backend.Application.Services
                     IsSuccess = true,
                     StatusCode = 200,
                 });
-
+                
                 return new PromocodeActivationResult.Success(promocode);
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Промокод {code} не активирован.", code);
+
+                await _transaction.RollbackTransactionAsync(ct);
 
                 await _audit.LogAsync(new AuditLog
                 {

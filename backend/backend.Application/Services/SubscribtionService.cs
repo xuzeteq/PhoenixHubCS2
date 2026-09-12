@@ -6,6 +6,7 @@ using backend.Domain.Enums.User;
 using backend.Domain.Exceptions;
 using backend.Domain.Models;
 using Microsoft.Extensions.Logging;
+using System.Text.Json;
 
 namespace backend.Application.Services
 {
@@ -16,15 +17,17 @@ namespace backend.Application.Services
         private readonly IUnitOfWork _transaction;
         private readonly ILogger<SubscribtionService> _logger;
         private readonly IAuditLogsService _audit;
+        private readonly IBalanceTransactionService _balanceTransaction;
 
         public SubscribtionService(ISubscribtionRepository repo, IUserRepository userRepo, ILogger<SubscribtionService> logger,
-            IUnitOfWork transaction, IAuditLogsService audit)
+            IUnitOfWork transaction, IAuditLogsService audit, IBalanceTransactionService balanceTransaction)
         {
             _repo = repo;
             _logger = logger;
             _userRepo = userRepo;
             _transaction = transaction;
             _audit = audit;
+            _balanceTransaction = balanceTransaction;
         }
 
         public async Task<List<SubscribtionResponseDto>> GetAllSubscribtionsAsync(CancellationToken cts = default)
@@ -64,8 +67,9 @@ namespace backend.Application.Services
 
             try
             {
-                user.Balance -= subscribtionPrice;
                 user.Role = RoleEnum.Phoenix;
+                await _balanceTransaction.WithdrowDepositAsync(userId, subscribtionPrice, "Покупка подписки",
+                    metadata: "Успешная активация подписки");
 
                 bool isSubscribeActive = user.SubscribtionExpireAt.HasValue && user.SubscribtionExpireAt > DateTime.UtcNow;
 
@@ -114,8 +118,6 @@ namespace backend.Application.Services
                 };
 
                 await _repo.AddAsync(subscribtion, cts);
-
-                await _userRepo.PatchAsync(user);
 
                 await _transaction.SaveChangesAsync(cts);
                 await _transaction.CommitTransactionAsync(cts);

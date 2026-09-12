@@ -10,6 +10,7 @@ namespace backend.Application
         public static IServiceCollection AddApplication(this IServiceCollection services)
         {
             services.AddScoped<IServerService, ServerService>();
+            services.AddScoped<IBalanceTransactionService, BalanceTransactionService>();
             services.AddScoped<IAuthService, AuthService>();
             services.AddScoped<IAdminUserService, AdminUserService>();
             services.AddScoped<ISubscribtionService, SubscribtionService>();

@@ -24,6 +24,7 @@ namespace backend.Infrastructure
             services.AddScoped<ISubscribtionRepository, SubscribtionRepository>();
             services.AddScoped<IPrivilegeRepository, PrivilegeRepository>();
             services.AddScoped<IFeatureRepository, FeatureRepository>();
+            services.AddScoped<IWheelSpinRepository, WheelSpinRepository>();
             services.AddScoped<IBalanceTransactionRepository, BalanceTransactionRepository>();
 
             services.AddScoped<AuditLogRepository>();

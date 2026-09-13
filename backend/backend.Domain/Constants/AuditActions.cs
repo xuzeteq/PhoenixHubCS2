@@ -30,5 +30,7 @@ namespace backend.Domain.Constants
         public const string BALANCE_DEPOSIT = "";
         public const string BALANCE_WITHDROW = "";
 
+        public const string WHEEL_SPIN_SUCCESS = "прокрутил колесо фортуны.";
+
     }
 }

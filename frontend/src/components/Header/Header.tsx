@@ -8,6 +8,7 @@ import { useAuth } from "../../contexts/AuthProvider";
 import DropdownMenu from "../Dropdown/DropdownMenu";
 import PaymentModal from "../Modals/PaymentModal";
 import { AnimatePresence } from "framer-motion";
+import WheelSpin from "../Wheel/WheelSpin";
 
 export default function Header() {
 
@@ -50,6 +51,7 @@ export default function Header() {
             ) : isAuthenticated ? (
                 <div className="flex items-center gap-4">
                     <div className="flex items-center gap-2">
+                        <WheelSpin />
                         <button className="flex items-center gap-2.5 px-5 py-2.5 rounded-xl border border-white/10 bg-blue-500/80 text-gray-300 text-sm font-semibold cursor-pointer
                             hover:bg-blue-500/80 hover:border-white/20 hover:text-white transition-all duration-300 group"
                             onClick={() => setIsOpenModal(true)}>

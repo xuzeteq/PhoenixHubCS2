@@ -18,6 +18,7 @@ namespace backend.Application
             services.AddScoped<IPrivilegeService, PrivilegeService>();
             services.AddScoped<IPromocodeService, PromocodeService>();
             services.AddScoped<IFeatureService, FeatureService>();
+            services.AddScoped<IWheelSpinService, WheelSpinService>();
             services.AddScoped<SubscribtionsCleanupService>();
 
             return services;

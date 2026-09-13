@@ -19,6 +19,7 @@ namespace backend.Infrastructure.Data
         public DbSet<AuditLog> AuditLogs { get; set; }
         public DbSet<BalanceTransaction> BalanceTransactions { get; set; }
         public DbSet<UserPrivilege> UserPrivileges { get; set; }
+        public DbSet<WheelItem> WheelItems { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -155,6 +156,18 @@ namespace backend.Infrastructure.Data
                 entity.Property(e => e.UserId).HasColumnName("user_id");
                 entity.Property(e => e.PrivilegeId).HasColumnName("privilege_id");
                 entity.Property(e => e.PurchasedAt).HasColumnName("purchased_at");
+            });
+
+            modelBuilder.Entity<WheelItem>(entity =>
+            {
+                entity.ToTable("wheel_items");
+
+                entity.Property(e => e.Id).HasColumnName("id");
+                entity.Property(e => e.UserId).HasColumnName("user_id");
+                entity.Property(e => e.Amount).HasColumnName("amount");
+                entity.Property(e => e.Weight).HasColumnName("weight");
+                entity.Property(e => e.Rarity).HasColumnName("rarity");
+                entity.Property(e => e.CreatedAt).HasColumnName("created_at");
             });
         }
     }

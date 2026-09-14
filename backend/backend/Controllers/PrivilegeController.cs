@@ -1,7 +1,10 @@
 ﻿using backend.Application.Dtos.Privilege;
 using backend.Application.Interfaces;
+using backend.Application.Results;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 
 namespace backend.API.Controllers
 {
@@ -32,6 +35,33 @@ namespace backend.API.Controllers
         public async Task<PrivilegeResponseDto> CreatePrivilegeAsync(CreatePrivilegeDto dto)
         {
             return await _service.CreatePrivilegeAsync(dto);
+        }
+
+        [HttpPost("purchase")]
+        [Authorize]
+        public async Task<IActionResult> PurchasePrivilegeAsync([FromBody] PurchasePrivilegeDto dto, CancellationToken ct = default)
+        {
+            var userIdString = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            if (string.IsNullOrEmpty(userIdString) || !int.TryParse(userIdString, out var userId))
+                return Unauthorized(new { message = "Неавторизованный пользователь." });
+
+            var result = await _service.PurchasePrivilegeAsync(userId, dto.PrivilegeId, ct);
+
+            return result switch
+            {
+                PrivilegePurchaseResult.Success(var privilege) => Ok(new
+                {
+                    message = "Привелегия успешно приоберетена!"
+                }),
+
+                PrivilegePurchaseResult.HaventMoney => BadRequest(new { message = "Недостаточно средств!", code = "HAVENT_MONEY" }),
+                PrivilegePurchaseResult.AlreadyPurchased => BadRequest(new { message = "Привелегия уже приобретена", code = "ALREADY_PURCHASED" }),
+                PrivilegePurchaseResult.Error(var message) => StatusCode(500, new { message = "Ошибка", details = message }),
+                _ => StatusCode(500)
+            };
+
+
         }
 
         [HttpPatch("{id}")]

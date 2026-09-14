@@ -24,8 +24,13 @@ namespace backend.Domain.Constants
         public const string SUBSCRIBTION_FAILED_RENEW_HAVENT_BALANCE = "не смог продлить подписку. Недостаточно средств.";
         public const string SUBSCRIBTION_FAILED = "не смог продлить подписку. Ошибка сервиса подписок.";
 
+        public const string PURCHASE_PRIVILEGE_FAILED_HAVENT_BALANCE = "не смог приобрести привилегию. Недостаточно средств.";
+        public const string PURCHASE_PRIVILEGE_SUCCESS = "успешно приобрел привилегию.";
+
         public const string BALANCE_DEPOSIT = "";
         public const string BALANCE_WITHDROW = "";
+
+        public const string WHEEL_SPIN_SUCCESS = "прокрутил колесо фортуны.";
 
     }
 }

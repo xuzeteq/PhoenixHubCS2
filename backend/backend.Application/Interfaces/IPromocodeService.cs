@@ -9,7 +9,7 @@ namespace backend.Application.Interfaces
         Task<PromocodeResponseDto> GetPromocodeByIdAsync(int id);
         Task<PromocodeResponseDto> CreatePromocodeAsync(CreatePromocodeDto dto);
         Task<PromocodeResponseDto> UpdatePromocodeAsync(UpdatePromocodeDto dto, int id);
-        Task<PromocodeActivationResult> ActivatePromocode(string code, int userId);
+        Task<PromocodeActivationResult> ActivatePromocode(string code, int userId, CancellationToken ct = default);
         Task<bool> RemovePromocodeAsync(int id);
     }
 }

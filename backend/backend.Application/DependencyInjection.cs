@@ -10,6 +10,7 @@ namespace backend.Application
         public static IServiceCollection AddApplication(this IServiceCollection services)
         {
             services.AddScoped<IServerService, ServerService>();
+            services.AddScoped<IBalanceTransactionService, BalanceTransactionService>();
             services.AddScoped<IAuthService, AuthService>();
             services.AddScoped<IAdminUserService, AdminUserService>();
             services.AddScoped<ISubscribtionService, SubscribtionService>();
@@ -17,6 +18,7 @@ namespace backend.Application
             services.AddScoped<IPrivilegeService, PrivilegeService>();
             services.AddScoped<IPromocodeService, PromocodeService>();
             services.AddScoped<IFeatureService, FeatureService>();
+            services.AddScoped<IWheelSpinService, WheelSpinService>();
             services.AddScoped<SubscribtionsCleanupService>();
 
             return services;

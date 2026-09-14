@@ -1,7 +1,8 @@
 import { useEffect, useRef, useState } from "react";
-import { IconX } from "@tabler/icons-react";
+import { IconExclamationCircle, IconX } from "@tabler/icons-react";
 import { promocodeApi } from "../../api/promocde.api";
 import axios from "axios";
+import { AnimatePresence, motion } from "framer-motion";
 
 interface PromocodeModalProps {
   isOpen: boolean;
@@ -51,6 +52,12 @@ export default function PromocodeModal({ isOpen, onClose }: PromocodeModalProps)
     }
   };
 
+  useEffect(() => {
+      if (!error) return;
+      const t = setTimeout(() => setError(null), 2000);
+      return () => clearTimeout(t);
+  }, [error]);
+
   const handleActivatePromocode = async () => {
     if (!code.trim()) return;
 
@@ -58,7 +65,7 @@ export default function PromocodeModal({ isOpen, onClose }: PromocodeModalProps)
     setError(null);
 
     try {
-      const data = await promocodeApi.activatePromocode(code.trim().toUpperCase());
+      await promocodeApi.activatePromocode(code)
       setCode('');
       onClose();
     } catch (err) {
@@ -73,22 +80,6 @@ export default function PromocodeModal({ isOpen, onClose }: PromocodeModalProps)
     }
   };
 
-  useEffect(() => {
-    const handleEsc = (e: KeyboardEvent) => {
-      if (e.key === "Escape") onClose();
-    };
-
-    if (isOpen) {
-      document.addEventListener("keydown", handleEsc);
-      document.body.style.overflow = "hidden";
-    }
-
-    return () => {
-      document.removeEventListener("keydown", handleEsc);
-      document.body.style.overflow = "";
-    };
-  }, [isOpen, onClose]);
-
   const handleBackdropClick = (e: React.MouseEvent) => {
     if (modalRef.current && !modalRef.current.contains(e.target as Node)) {
       onClose();
@@ -99,7 +90,7 @@ export default function PromocodeModal({ isOpen, onClose }: PromocodeModalProps)
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/70
                  animate-in fade-in duration-200"
       onClick={handleBackdropClick}
     >
@@ -122,17 +113,26 @@ export default function PromocodeModal({ isOpen, onClose }: PromocodeModalProps)
             ПРОМОКОД:
           </h1>
 
-          {error && (
-            <div className={`mt-3 p-3 rounded-lg border flex items-start gap-3
-                            animate-in slide-in-from-top-2 duration-300
-                            ${error.type === 'NOT_FOUND' ? 'bg-red-500/10 border-red-500/30 text-red-400' : ''}
-                            ${error.type === 'EXPIRED' ? 'bg-red-500/10 border-red-500/30 text-red-400' : ''}
-                            ${error.type === 'USAGE_LIMIT' ? 'bg-red-500/10 border-red-500/30 text-red-400' : ''}
-                            ${error.type === 'ALREADY_USED' ? 'bg-red-500/10 border-red-500/30 text-red-400' : ''}
-                            ${error.type === 'GENERAL' ? 'bg-red-500/10 border-red-500/30 text-red-400' : ''}`}>
-              <p className="text-sm font-medium">{error.message}</p>
-            </div>
-          )}
+          <AnimatePresence>
+              {error && (
+                  <div className="fixed bottom-0 left-1/2 -translate-x-1/2 z-50 pointer-events-none">
+                  <motion.div
+                      initial={{ y: 120, opacity: 0 }}
+                      animate={{ y: 0, opacity: 1 }}
+                      exit={{ y: 120, opacity: 0 }}
+                      transition={{ type: 'spring', stiffness: 260, damping: 26 }}
+                      className="pointer-events-auto mb-4
+                              flex items-center gap-3 p-3 pr-4 rounded-lg border shadow-lg
+                              bg-red-500/10 border-red-500/30 text-red-400"
+                  >
+                      <div className="w-6 h-6 flex items-center justify-center shrink-0 mt-0.5">
+                      <IconExclamationCircle />
+                      </div>
+                      <p className="text-sm font-medium">{error.message}</p>
+                  </motion.div>
+                  </div>
+              )}
+          </AnimatePresence>
 
           <input
             type="text"

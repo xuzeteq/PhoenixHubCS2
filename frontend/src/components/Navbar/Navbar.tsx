@@ -15,6 +15,7 @@ export default function Navbar() {
     return (
         <>
             <div className="fixed w-55 h-full overflow-y-auto min-h-screen border-r border-neutral-800 bg-[#131313] flex flex-col">
+                <div className="absolute -top-12.5 -left-12.5 w-40 h-40 bg-blue-500/20 rounded-full blur-3xl animate-pulse pointer-events-none"/>
 
                 <div className='flex items-center gap-2 justify-center py-4'>
                     <img src="logo.png" alt="" className='w-8'/>
@@ -26,7 +27,7 @@ export default function Navbar() {
                     <div className="border border-neutral-800 w-48"/>
                 </div>
 
-                <nav className="flex flex-1 flex-col px-2">
+                <nav className="flex flex-1 flex-col px-2 z-55">
 
                     {navLinks.map(link => (
                         <NavLink

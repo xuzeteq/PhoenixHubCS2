@@ -1,4 +1,5 @@
-﻿using backend.Application.Dtos.Privilege;
+﻿using backend.Application.Dtos.Feature;
+using backend.Application.Dtos.Privilege;
 using backend.Domain.Models;
 
 namespace backend.Application.Mappings
@@ -13,6 +14,13 @@ namespace backend.Application.Mappings
                 Title = privilege.Title,
                 Price = privilege.Price,
                 OldPrice = privilege.OldPrice,
+                ImageUrl = privilege.ImageUrl,
+                Features = privilege.PrivilegeFeatures.Select(pf => new FeatureResponseDto
+                {
+                    Title = pf.Feature.Title,
+                    Description = pf.Feature.Description,
+                    Icon = pf.Feature.Icon,
+                }).ToList(),
                 CreatedAt = privilege.CreatedAt,
             };
         }

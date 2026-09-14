@@ -17,6 +17,9 @@ namespace backend.Infrastructure.Data
         public DbSet<PrivilegeFeature> PrivilegeFeatures { get; set; }
         public DbSet<AppLog> Logs { get; set; }
         public DbSet<AuditLog> AuditLogs { get; set; }
+        public DbSet<BalanceTransaction> BalanceTransactions { get; set; }
+        public DbSet<UserPrivilege> UserPrivileges { get; set; }
+        public DbSet<WheelItem> WheelItems { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -71,6 +74,7 @@ namespace backend.Infrastructure.Data
                 entity.Property(e => e.Id).HasColumnName("id");
                 entity.Property(e => e.Title).HasColumnName("title");
                 entity.Property(e => e.Price).HasColumnName("price");
+                entity.Property(e => e.ImageUrl).HasColumnName("image_url");
                 entity.Property(e => e.OldPrice).HasColumnName("old_price");
                 entity.Property(e => e.CreatedAt).HasColumnName("created_at");
             });
@@ -112,7 +116,7 @@ namespace backend.Infrastructure.Data
                 entity.Property(e => e.Id).HasColumnName("id");
                 entity.Property(e => e.UserId).HasColumnName("user_id");
                 entity.Property(e => e.Username).HasMaxLength(100).HasColumnName("username");
-                entity.Property(e => e.Action).HasMaxLength(50).IsRequired().HasColumnName("action");
+                entity.Property(e => e.Action).HasMaxLength(100).IsRequired().HasColumnName("action");
                 entity.Property(e => e.EntityType).HasMaxLength(100).IsRequired().HasColumnName("entity_type");
                 entity.Property(e => e.EntityId).HasMaxLength(100).HasColumnName("entity_id");
                 entity.Property(e => e.EntityName).HasMaxLength(200).HasColumnName("entity_name");
@@ -127,6 +131,43 @@ namespace backend.Infrastructure.Data
                 entity.Property(e => e.ValidUntil).HasMaxLength(10).HasColumnName("valid_until");
                 entity.Property(e => e.Metadata).HasMaxLength(10).HasColumnName("metadata");
                 entity.Property(e => e.Timestamp).HasMaxLength(10).HasColumnName("timestamp");
+            });
+
+            modelBuilder.Entity<BalanceTransaction>(entity =>
+            {
+                entity.ToTable("balance_transactions");
+
+                entity.Property(e => e.Id).HasColumnName("id");
+                entity.Property(e => e.UserId).HasColumnName("user_id");
+                entity.Property(e => e.Type).HasColumnName("type");
+                entity.Property(e => e.BalanceBefore).HasColumnName("balance_before");
+                entity.Property(e => e.BalanceAfter).HasColumnName("balance_after");
+                entity.Property(e => e.Description).HasColumnName("description");
+                entity.Property(e => e.ReferenceId).HasColumnName("reference_id");
+                entity.Property(e => e.Metadata).HasColumnName("metadata");
+                entity.Property(e => e.CreatedAt).HasColumnName("created_at");
+            });
+
+            modelBuilder.Entity<UserPrivilege>(entity =>
+            {
+                entity.ToTable("user_privileges");
+
+                entity.Property(e => e.Id).HasColumnName("id");
+                entity.Property(e => e.UserId).HasColumnName("user_id");
+                entity.Property(e => e.PrivilegeId).HasColumnName("privilege_id");
+                entity.Property(e => e.PurchasedAt).HasColumnName("purchased_at");
+            });
+
+            modelBuilder.Entity<WheelItem>(entity =>
+            {
+                entity.ToTable("wheel_items");
+
+                entity.Property(e => e.Id).HasColumnName("id");
+                entity.Property(e => e.UserId).HasColumnName("user_id");
+                entity.Property(e => e.Amount).HasColumnName("amount");
+                entity.Property(e => e.Weight).HasColumnName("weight");
+                entity.Property(e => e.Rarity).HasColumnName("rarity");
+                entity.Property(e => e.CreatedAt).HasColumnName("created_at");
             });
         }
     }

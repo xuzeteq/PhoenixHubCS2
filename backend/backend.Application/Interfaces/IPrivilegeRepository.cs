@@ -11,5 +11,7 @@ namespace backend.Application.Interfaces
         Task AddFeaturesToPrivilegeAsync(int privilegeId, List<int> featureIds);
         Task UpdateAsync(Privilege privilege);
         Task DeleteAsync(Privilege privilege);
+        Task<bool> HasUserPrivilegeAsync(int userId, int privilegeId);
+        Task AddPrivilegeUserAsync(UserPrivilege userPrivilege);
     }
 }
